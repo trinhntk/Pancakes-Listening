@@ -1,0 +1,1437 @@
+<title>Pancakes Writing Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAF4E6; --surface:#FFFFFF; --surface-alt:#FBF0DB; --surface-sunken:#F3E7CE;
+    --ink:#2E2117; --ink-dim:#6E5C49; --line:#E6D6B8;
+    --maple:#B96A17; --maple-soft:#F2DEBA;
+    --berry:#733458; --berry-soft:#F1DCE6;
+    --sage:#3F6B3F; --sage-soft:#DEEAD9;
+    --rust:#A43F28; --rust-soft:#F6DED6;
+    --locked:#9C8C76; --locked-soft:#EFE6D3;
+    --shadow: 0 1px 2px rgba(46,33,23,.06), 0 6px 18px -8px rgba(46,33,23,.18);
+    --radius: 14px;
+    color-scheme: light;
+  }
+
+  *{box-sizing:border-box;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Work Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size:16px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{ font-family:"Fraunces", Georgia, serif; text-wrap:balance; margin:0; color:var(--ink); }
+  .mono{ font-family:"IBM Plex Mono", ui-monospace, Menlo, monospace; }
+  a{ color:var(--maple); }
+
+  .wrap{ max-width:980px; margin:0 auto; padding:0 20px 80px; }
+
+  /* header */
+  header.top{ padding:36px 20px 18px; max-width:980px; margin:0 auto; }
+  .kicker{ font-family:"IBM Plex Mono",monospace; font-size:12.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--maple);
+    background:var(--maple-soft); display:inline-flex; align-items:center; gap:7px; padding:5px 11px; border-radius:999px; }
+  .kicker svg{ width:14px; height:14px; }
+  h1.title{ font-size:clamp(28px,4.5vw,42px); font-weight:700; margin-top:14px; }
+  .subtitle{ color:var(--ink-dim); margin-top:6px; font-size:16px; max-width:62ch; }
+  .audio-note{ margin-top:18px; display:flex; gap:12px; align-items:center; background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:12px 16px; box-shadow:var(--shadow); flex-wrap:wrap; }
+  .audio-note .ic{ flex:0 0 auto; width:38px; height:38px; border-radius:999px; background:var(--maple-soft); color:var(--maple);
+    display:flex; align-items:center; justify-content:center; }
+  .audio-note .ic svg{ width:19px; height:19px; }
+  .audio-note .txt{ flex:1 1 260px; }
+  .audio-note .txt b{ font-weight:600; }
+  .audio-note .txt small{ display:block; color:var(--ink-dim); margin-top:2px; }
+  audio.player{ width:100%; max-width:320px; }
+
+  /* nav tabs */
+  nav.tabs{ position:sticky; top:0; z-index:40; background:var(--bg); padding:14px 0 10px; margin-top:22px;
+    border-bottom:1px solid var(--line); }
+  nav.tabs .row{ display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; scrollbar-width:thin; }
+  .navtab{ flex:0 0 auto; display:flex; align-items:center; gap:7px; padding:9px 15px; border-radius:999px;
+    border:1px solid var(--line); background:var(--surface); color:var(--ink-dim); font-size:14.5px; font-weight:500;
+    cursor:pointer; white-space:nowrap; transition:background .15s, color .15s, border-color .15s; }
+  .navtab:hover{ border-color:var(--maple); color:var(--ink); }
+  .navtab.active{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  .navtab .num{ font-family:"IBM Plex Mono",monospace; font-size:12px; opacity:.8; }
+  .navtab .check{ width:15px; height:15px; color:var(--sage); }
+  .navtab.active .check{ color:var(--bg); }
+
+  main{ padding-top:28px; }
+  section.part{ display:none; }
+  section.part.active{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .part-head{ margin-bottom:22px; }
+  .part-head .eyebrow{ font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-dim); letter-spacing:.05em; text-transform:uppercase; }
+  .part-head h2{ font-size:clamp(22px,3vw,30px); margin-top:4px; }
+  .part-head p{ color:var(--ink-dim); margin-top:8px; max-width:68ch; }
+  .meta-row{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+  .meta-chip{ font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-dim); background:var(--surface-alt); border:1px solid var(--line);
+    padding:4px 10px; border-radius:999px; }
+
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px; margin-bottom:18px; }
+  .card h3{ font-size:19px; margin-bottom:10px; }
+  .card.soft{ background:var(--surface-alt); }
+
+  .btn{ font-family:"Work Sans",sans-serif; font-weight:600; font-size:14.5px; border-radius:10px; padding:10px 18px;
+    border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; transition:transform .1s, border-color .15s, background .15s;
+    display:inline-flex; align-items:center; gap:8px; }
+  .btn:hover{ border-color:var(--maple); }
+  .btn:active{ transform:translateY(1px); }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn-primary{ background:var(--maple); color:var(--bg); border-color:var(--maple); }
+  .btn-primary:hover{ filter:brightness(1.05); border-color:var(--maple); }
+  .btn-berry{ background:var(--berry); color:var(--bg); border-color:var(--berry); }
+  .btn-sm{ padding:6px 12px; font-size:13px; }
+  .btn-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; align-items:center; }
+
+  /* sortable cards */
+  .sort-list{ display:flex; flex-direction:column; gap:10px; }
+  .sort-card{ display:flex; align-items:center; gap:14px; background:var(--surface); border:2px solid var(--line); border-radius:12px;
+    padding:10px 14px; cursor:grab; transition:border-color .15s, background .15s; }
+  .sort-card.dragging{ opacity:.45; }
+  .sort-card.ok{ border-color:var(--sage); background:var(--sage-soft); }
+  .sort-card.bad{ border-color:var(--rust); background:var(--rust-soft); }
+  .sort-card .icon-tile{ flex:0 0 auto; width:54px; height:54px; border-radius:10px; background:var(--surface-alt); color:var(--maple);
+    display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .sort-card .icon-tile svg{ width:30px; height:30px; }
+  .sort-card .icon-tile img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .sort-card .label{ flex:1 1 auto; min-width:0; }
+  .sort-card .label .let{ font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:12.5px; color:var(--maple); }
+  .sort-card .label .vi{ font-size:15px; margin-top:1px; }
+  .sort-card .pos{ font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--ink-dim); width:20px; text-align:center; }
+  .reorder-btns{ display:flex; flex-direction:column; gap:3px; }
+  .reorder-btns button{ width:26px; height:22px; border-radius:6px; border:1px solid var(--line); background:var(--surface); color:var(--ink-dim); cursor:pointer; }
+  .reorder-btns button:hover{ border-color:var(--maple); color:var(--ink); }
+  .reorder-btns button:disabled{ opacity:.35; cursor:not-allowed; }
+
+  .score-badge{ display:inline-flex; align-items:center; gap:6px; font-family:"IBM Plex Mono",monospace; font-size:13.5px; font-weight:600;
+    padding:5px 11px; border-radius:999px; background:var(--surface-alt); color:var(--ink); }
+  .score-badge.good{ background:var(--sage-soft); color:var(--sage); }
+  .score-badge.mid{ background:var(--maple-soft); color:var(--maple); }
+
+  /* gap fill */
+  .gaptext{ font-size:16.5px; line-height:2.15; }
+  .gaptext input.gap{ width:112px; font-family:"IBM Plex Mono",monospace; font-size:14px; border:none; border-bottom:2px solid var(--line);
+    background:transparent; color:var(--ink); padding:2px 4px; text-align:center; }
+  .gaptext input.gap:focus{ outline:none; border-color:var(--maple); }
+  .gaptext input.gap.ok{ border-color:var(--sage); color:var(--sage); font-weight:600; }
+  .gaptext input.gap.bad{ border-color:var(--rust); color:var(--rust); }
+  .gap-answer{ font-size:12px; color:var(--sage); font-family:"IBM Plex Mono",monospace; }
+
+  /* mcq */
+  .mcq{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+  .mcq label{ display:flex; gap:10px; align-items:flex-start; padding:10px 13px; border:1.5px solid var(--line); border-radius:10px; cursor:pointer;
+    transition:border-color .15s, background .15s; background:var(--surface); }
+  .mcq label:hover{ border-color:var(--maple); }
+  .mcq label input{ margin-top:3px; accent-color:var(--maple); flex:0 0 auto; }
+  .mcq label.ok{ border-color:var(--sage); background:var(--sage-soft); }
+  .mcq label.bad{ border-color:var(--rust); background:var(--rust-soft); }
+  .mcq-q{ margin-top:22px; }
+  .mcq-q:first-child{ margin-top:0; }
+  .mcq-q .q{ font-weight:600; margin-bottom:4px; }
+  .explain{ margin-top:8px; font-size:14px; color:var(--ink-dim); background:var(--surface-sunken); border-radius:8px; padding:9px 12px; display:none; }
+  .explain.show{ display:block; }
+
+  .locked-box{ border:1.5px dashed var(--locked); background:var(--locked-soft); color:var(--locked); border-radius:12px; padding:18px 20px;
+    display:flex; gap:12px; align-items:center; font-size:14.5px; }
+  .locked-box svg{ width:22px; height:22px; flex:0 0 auto; }
+
+  .reveal{ margin-top:18px; }
+
+  table.data{ width:100%; border-collapse:collapse; font-size:14.5px; }
+  table.data th, table.data td{ text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  table.data th{ font-family:"IBM Plex Mono",monospace; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-dim); }
+  table.data tr:last-child td{ border-bottom:none; }
+  .table-wrap{ overflow-x:auto; }
+
+  .transcript p{ margin:0 0 14px; }
+  .transcript u{ text-decoration-color:var(--maple); text-decoration-thickness:2px; }
+
+  /* part4 layout */
+  .p4-layout{ display:grid; grid-template-columns:230px 1fr; gap:20px; align-items:start; }
+  @media (max-width:760px){ .p4-layout{ grid-template-columns:1fr; } }
+  .step-list{ display:flex; flex-direction:column; gap:6px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:10px; box-shadow:var(--shadow); position:sticky; top:84px; }
+  @media (max-width:760px){ .step-list{ position:static; flex-direction:row; overflow-x:auto; } }
+  .step-item{ display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; cursor:pointer; border:1px solid transparent; }
+  .step-item:hover{ background:var(--surface-alt); }
+  .step-item.active{ background:var(--maple-soft); border-color:var(--maple); }
+  .step-item .n{ font-family:"IBM Plex Mono",monospace; font-size:12px; width:20px; height:20px; border-radius:999px; background:var(--surface-sunken);
+    display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .step-item.done .n{ background:var(--sage); color:var(--bg); }
+  .step-item .t{ font-size:13.5px; white-space:nowrap; }
+  @media (max-width:760px){ .step-item{ flex-direction:column; min-width:72px; } .step-item .t{ white-space:normal; text-align:center; font-size:11.5px; } }
+
+  .rung-tabs{ display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+  .rung-tab{ font-size:13.5px; padding:7px 13px; border-radius:8px; border:1px solid var(--line); background:var(--surface); cursor:pointer; color:var(--ink-dim);
+    display:flex; align-items:center; gap:6px; }
+  .rung-tab.active{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  .rung-tab:disabled{ opacity:.45; cursor:not-allowed; }
+  .rung-tab svg{ width:13px; height:13px; }
+
+  .phrase-chip{ display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:13px; background:var(--surface-alt); color:var(--maple);
+    padding:3px 9px; border-radius:7px; margin:2px 4px 2px 0; }
+  .orig-quote{ border-left:3px solid var(--maple); padding:10px 16px; background:var(--surface-alt); border-radius:0 10px 10px 0; font-style:italic; margin:12px 0; }
+  .starter-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+  .step-photo{ width:100%; max-width:280px; border-radius:12px; display:block; margin:0 0 14px; box-shadow:var(--shadow); }
+  .step-photo-wrap{ display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start; }
+  .step-photo-wrap .no-photo{ width:100%; max-width:280px; aspect-ratio:301/236; border-radius:12px; background:var(--surface-alt); color:var(--maple);
+    display:flex; align-items:center; justify-content:center; margin:0 0 14px; }
+  .step-photo-wrap .no-photo svg{ width:64px; height:64px; }
+  .step-obs-text{ flex:1 1 260px; min-width:0; }
+  .hint-note{ margin:12px 0 16px; background:var(--surface-sunken); border:1px dashed var(--line); border-radius:10px; padding:12px 16px; font-size:14.5px; }
+  .hint-note .lbl{ font-family:"IBM Plex Mono",monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-dim); margin-bottom:5px; }
+  .hint-note .frame{ font-style:italic; color:var(--ink-dim); }
+  .hint-note .frame b{ font-style:normal; color:var(--maple); font-weight:600; }
+
+  label.field-label{ display:block; font-size:13px; font-weight:600; color:var(--ink-dim); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em; }
+  textarea.ta, input.ta{ width:100%; font-family:"Work Sans",sans-serif; font-size:15.5px; line-height:1.6; border:1.5px solid var(--line); border-radius:10px;
+    padding:12px 14px; background:var(--surface); color:var(--ink); resize:vertical; min-height:70px; }
+  input.ta{ min-height:auto; padding:11px 14px; }
+  textarea.ta:focus, input.ta:focus{ outline:none; border-color:var(--maple); }
+  .keyword-row{ margin:10px 0 14px; }
+
+  .model-box{ border:1.5px solid var(--sage); background:var(--sage-soft); border-radius:12px; padding:16px 18px; }
+  .model-box .lbl{ font-family:"IBM Plex Mono",monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--sage); margin-bottom:6px; }
+  .model-box .sent{ font-size:16px; }
+  .tip-box{ margin-top:12px; font-size:14px; background:var(--maple-soft); color:var(--maple); padding:10px 14px; border-radius:10px; }
+
+  .checklist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px; }
+  .checklist li{ display:flex; gap:10px; align-items:flex-start; font-size:14.5px; }
+  .checklist input{ margin-top:4px; accent-color:var(--sage); flex:0 0 auto; }
+
+  .connector-table td{ font-size:13.5px; }
+  .connector-table td:nth-child(2){ font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--maple); }
+
+  .wordcount{ font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--ink-dim); margin-top:6px; }
+  .wordcount.warn{ color:var(--rust); }
+  .wordcount.good{ color:var(--sage); }
+
+  .round-tabs{ display:flex; gap:8px; margin-bottom:18px; }
+  .round-tab{ flex:1 1 0; text-align:center; padding:10px; border-radius:10px; border:1px solid var(--line); background:var(--surface); cursor:pointer; font-size:14px; font-weight:600; color:var(--ink-dim); }
+  .round-tab.active{ background:var(--berry); color:var(--bg); border-color:var(--berry); }
+  .round-tab:disabled{ opacity:.4; cursor:not-allowed; }
+
+  .essay-box p{ margin:0 0 12px; }
+  .essay-box strong{ color:var(--berry); font-weight:700; }
+
+  .rubric th:nth-child(2), .rubric td:nth-child(2){ font-family:"IBM Plex Mono",monospace; text-align:center; }
+  .code-chip{ font-family:"IBM Plex Mono",monospace; font-weight:700; background:var(--berry-soft); color:var(--berry); padding:2px 8px; border-radius:6px; font-size:12.5px; }
+
+  /* auto-grade */
+  .grade-head{ display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
+  .grade-score{ font-family:"Fraunces",serif; font-size:52px; font-weight:700; line-height:1; color:var(--berry); }
+  .grade-score small{ font-family:"Work Sans",sans-serif; font-size:16px; font-weight:500; color:var(--ink-dim); }
+  .grade-crit{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-top:18px; }
+  .grade-crit-item{ background:var(--surface-alt); border-radius:10px; padding:10px 13px; }
+  .grade-crit-item .n{ font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:17px; }
+  .grade-crit-item .n small{ font-size:12px; color:var(--ink-dim); font-weight:400; }
+  .grade-crit-item .l{ font-size:12.5px; color:var(--ink-dim); margin-top:2px; }
+  .issue-list{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+  .issue-row{ display:flex; gap:10px; align-items:flex-start; padding:9px 12px; border-radius:9px; background:var(--rust-soft); font-size:13.5px; }
+  .issue-row.ok-row{ background:var(--sage-soft); }
+  .issue-row .msg{ flex:1 1 auto; }
+  .issue-empty{ font-size:14.5px; color:var(--sage); background:var(--sage-soft); padding:10px 14px; border-radius:10px; margin-top:14px; }
+
+  footer.foot{ max-width:980px; margin:40px auto 0; padding:20px; color:var(--ink-dim); font-size:13px; border-top:1px solid var(--line); }
+
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+  :focus-visible{ outline:2.5px solid var(--maple); outline-offset:2px; }
+
+  .name-note{ margin-top:14px; display:flex; gap:14px; align-items:center; background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:12px 16px; box-shadow:var(--shadow); flex-wrap:wrap; }
+  .name-note .ic{ flex:0 0 auto; width:38px; height:38px; border-radius:999px; background:var(--berry-soft); color:var(--berry);
+    display:flex; align-items:center; justify-content:center; }
+  .name-note .ic svg{ width:18px; height:18px; }
+  .name-note .txt{ flex:0 1 220px; }
+  .name-note .txt b{ font-weight:600; }
+  .name-note .txt small{ display:block; color:var(--ink-dim); margin-top:2px; }
+  .name-note input.ta{ flex:1 1 220px; min-width:0; }
+  .send-status{ font-size:13px; color:var(--sage); margin-top:10px; display:flex; align-items:center; gap:6px; }
+  .send-status.warn{ color:var(--rust); }
+</style>
+
+<header class="top">
+  <span class="kicker">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    Track 13 · Campus Cook-in
+  </span>
+  <h1 class="title">Pancakes Writing Lab</h1>
+  <p class="subtitle">Nghe quy trình làm bánh pancake, luyện từng câu, rồi viết hai đoạn thân bài IELTS Writing Task&nbsp;1 (process). 5 phần, khoảng 75 phút — làm liền một lần.</p>
+  <div class="name-note">
+    <span class="ic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+    </span>
+    <div class="txt">
+      <b>Họ và tên</b>
+      <small>Dùng để báo cáo điểm lên Google Form</small>
+    </div>
+    <input type="text" id="reportName" class="ta" placeholder="Nguyễn Văn A">
+  </div>
+  <div class="audio-note">
+    <span class="ic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    </span>
+    <div class="txt">
+      <b>Audio Track 13 — "Campus Cook-in"</b>
+      <small>Nghe lại không giới hạn.</small>
+    </div>
+    <audio class="player" controls src="assets/audio/track13.mp3"></audio>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="wrap" style="padding:0;">
+    <div class="row" id="navRow"></div>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- ================= PART 1 ================= -->
+  <section class="part" id="part1">
+    <div class="part-head">
+      <div class="eyebrow">Part 1 · 5 phút</div>
+      <h2>Listen and order</h2>
+      <p>Listen to a TV cooking programme. Put the photos A–G in the correct order. Kéo thẻ (hoặc dùng mũi tên) để sắp xếp 7 tranh đúng trình tự bạn nghe được.</p>
+      <div class="meta-row"><span class="meta-chip">Kéo-thả</span><span class="meta-chip">Chấm tự động</span><span class="meta-chip">7 tranh</span></div>
+    </div>
+    <div class="card">
+      <h3>Sắp xếp 7 tranh</h3>
+      <div class="sort-list" id="p1List"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="p1Check">Kiểm tra</button>
+        <span class="score-badge" id="p1Score" style="display:none;"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PART 2 ================= -->
+  <section class="part" id="part2">
+    <div class="part-head">
+      <div class="eyebrow">Part 2 · 15 phút</div>
+      <h2>Listen and complete</h2>
+      <p>Nghe lại Track 13 và hoàn thành ba phần nhỏ bên dưới, sau đó bấm <b>Nộp Part 2</b> một lần ở cuối trang để chấm toàn bộ.</p>
+      <div class="meta-row"><span class="meta-chip">Điền khuyết</span><span class="meta-chip">Trắc nghiệm</span><span class="meta-chip">Kéo-thả</span></div>
+    </div>
+
+    <div class="card">
+      <h3>2A — Gap-fill</h3>
+      <p style="color:var(--ink-dim); font-size:14px; margin-top:-4px;">Listen again and complete the text. Write <b>NO MORE THAN THREE WORDS</b> for each gap.</p>
+      <div class="gaptext" id="gapText"></div>
+      <div class="btn-row">
+        <button class="btn" id="p2aCheck">Kiểm tra 2A</button>
+        <span class="score-badge" id="p2aScore" style="display:none;"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>2B — Hai bước không có tranh</h3>
+      <p style="color:var(--ink-dim); font-size:14px; margin-top:-4px;">The recording has 9 steps, but there are only 7 photos. Which <b>TWO</b> steps have no photo? Choose two answers.</p>
+      <div class="mcq" id="p2bOptions"></div>
+      <div class="btn-row">
+        <button class="btn" id="p2bCheck">Kiểm tra 2B</button>
+        <span class="score-badge" id="p2bScore" style="display:none;"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>2C — Sắp xếp đủ 9 bước</h3>
+      <p style="color:var(--ink-dim); font-size:14px; margin-top:-4px;">Put all 9 steps (7 tranh + 2 thẻ chữ của 2B) in the correct order.</p>
+      <div class="sort-list" id="p2cList"></div>
+      <div class="btn-row">
+        <button class="btn" id="p2cCheck">Kiểm tra 2C</button>
+        <span class="score-badge" id="p2cScore" style="display:none;"></span>
+      </div>
+    </div>
+
+    <div class="card soft">
+      <div class="btn-row" style="margin-top:0;">
+        <button class="btn btn-primary" id="p2SubmitAll">Nộp Part 2 (chấm toàn bộ &amp; mở transcript)</button>
+      </div>
+    </div>
+
+    <div class="reveal" id="p2Reveal" hidden>
+      <div class="card">
+        <h3>Transcript đầy đủ — Track 13</h3>
+        <div class="transcript" id="transcriptBox"></div>
+      </div>
+      <div class="card">
+        <h3>Đáp án Part 1 — thứ tự đúng &amp; câu tín hiệu</h3>
+        <div class="table-wrap"><table class="data" id="p1AnswerTable"></table></div>
+      </div>
+      <div class="card">
+        <h3>Đáp án Part 2A</h3>
+        <div class="table-wrap"><table class="data" id="p2aAnswerTable"></table></div>
+      </div>
+    </div>
+    <div class="locked-box" id="p2Locked">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+      Transcript và đáp án chi tiết sẽ mở sau khi bạn bấm <b>"Nộp Part 2"</b> ở trên.
+    </div>
+  </section>
+
+  <!-- ================= PART 3 ================= -->
+  <section class="part" id="part3">
+    <div class="part-head">
+      <div class="eyebrow">Part 3 · 5 phút</div>
+      <h2>Dàn ý</h2>
+      <p>Trước khi luyện từng câu, hãy nắm khung của cả bài viết: đề bài, mở bài, overview và cách chia đoạn.</p>
+      <div class="meta-row"><span class="meta-chip">Trắc nghiệm</span><span class="meta-chip">Chấm tự động</span></div>
+    </div>
+
+    <div class="card">
+      <h3>Đề bài</h3>
+      <p style="font-style:italic;">The pictures below show how pancakes are made.<br>Summarise the information by selecting and reporting the main features.</p>
+    </div>
+
+    <div class="card">
+      <h3>Mở bài &amp; Overview (cho sẵn)</h3>
+      <p>The pictures illustrate the process of making pancakes.</p>
+      <p>Overall, there are nine stages, beginning with weighing the ingredients and ending with serving the pancakes. The process can be divided into two main phases: preparing the batter and cooking the pancakes.</p>
+    </div>
+
+    <div class="card">
+      <h3>Dàn ý cả bài</h3>
+      <div class="table-wrap"><table class="data">
+        <tr><th>Đoạn</th><th>Bước</th><th>Nội dung</th></tr>
+        <tr><td>Mở bài</td><td>–</td><td>Cho sẵn</td></tr>
+        <tr><td>Overview</td><td>–</td><td>Cho sẵn</td></tr>
+        <tr><td>Body 1 — Preparing the batter</td><td>1–4</td><td>Cân → bột khô vào tô → trộn nguyên liệu lỏng → trộn thành bột sệt</td></tr>
+        <tr><td>Body 2 — Cooking the pancakes</td><td>5–9</td><td>Làm nóng chảo → đổ bột, nướng → lật bánh → để ra đĩa, đậy lại → dọn ra</td></tr>
+      </table></div>
+    </div>
+
+    <div class="card">
+      <h3>Kiểm tra nhanh</h3>
+      <div id="p3Quiz"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="p3Check">Nộp Part 3</button>
+        <span class="score-badge" id="p3Score" style="display:none;"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PART 4 ================= -->
+  <section class="part" id="part4">
+    <div class="part-head">
+      <div class="eyebrow">Part 4 · 25 phút</div>
+      <h2>Luyện từng bước</h2>
+      <p>Đi qua 9 bước, mỗi bước leo 3 nấc: <b>Quan sát → Viết câu → Câu mẫu</b>. Câu mẫu mở khoá sau khi bạn thử viết câu.</p>
+      <div class="meta-row"><span class="meta-chip">9 bước × 3 nấc</span><span class="meta-chip">Tự so sánh với câu mẫu</span></div>
+    </div>
+    <div class="p4-layout">
+      <div class="step-list" id="p4StepList"></div>
+      <div class="card" id="p4Panel" style="margin-bottom:0;"></div>
+    </div>
+  </section>
+
+  <!-- ================= PART 5 ================= -->
+  <section class="part" id="part5">
+    <div class="part-head">
+      <div class="eyebrow">Part 5 · 25 phút</div>
+      <h2>Viết bài qua 3 vòng</h2>
+      <p>Tự viết hai đoạn thân bài (120–140 từ) dựa vào những câu bạn đã luyện ở Part 4, rồi tự sửa qua 3 vòng: Drafting → Revising → Editing. Mở bài và overview đã cho sẵn ở Part 3.</p>
+      <div class="meta-row"><span class="meta-chip">Body 1: bước 1–4</span><span class="meta-chip">Body 2: bước 5–9</span><span class="meta-chip">Chấm tự động theo mã lỗi</span></div>
+    </div>
+
+    <div class="round-tabs" id="p5RoundTabs"></div>
+
+    <div class="card">
+      <label class="field-label">Body 1 — Preparing the batter</label>
+      <textarea class="ta" id="p5Body1" rows="4"></textarea>
+      <label class="field-label" style="margin-top:14px;">Body 2 — Cooking the pancakes</label>
+      <textarea class="ta" id="p5Body2" rows="5"></textarea>
+      <div class="wordcount" id="p5WordCount"></div>
+    </div>
+
+    <div class="card" id="p5RoundExtra"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="p5NextRound">Lưu &amp; sang vòng sau</button>
+    </div>
+
+    <div class="card" style="margin-top:22px;">
+      <h3>Bảng từ nối tham khảo</h3>
+      <div class="table-wrap"><table class="data connector-table">
+        <tr><th>Mục đích</th><th>Từ nối</th><th>Ví dụ</th></tr>
+        <tr><td>Bước đầu</td><td>In the first stage, / First,</td><td>In the first stage, all the ingredients are weighed.</td></tr>
+        <tr><td>Bước tiếp theo</td><td>Next, / Then, / After that, / … is then …</td><td>The batter is then poured into the pan.</td></tr>
+        <tr><td>Sau khi một bước xong</td><td>Once … , / When … ,</td><td>Once the butter has melted, …</td></tr>
+        <tr><td>Cùng lúc</td><td>while … / At the same time,</td><td>…, while the egg, milk and oil are combined in a separate bowl.</td></tr>
+        <tr><td>Thời điểm cụ thể</td><td>At this point, / until …</td><td>At this point, the pancake is turned over.</td></tr>
+        <tr><td>Bước cuối</td><td>Finally, / In the final stage,</td><td>Finally, the pancakes are served with fruit.</td></tr>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- ================= SAMPLE & SCORING ================= -->
+  <section class="part" id="sample">
+    <div class="part-head">
+      <div class="eyebrow">Bài mẫu &amp; thang điểm</div>
+      <h2>So sánh với bài mẫu</h2>
+      <p>Mở sau khi bạn nộp vòng 3 (Editing) ở Part 5.</p>
+    </div>
+    <div id="sampleLocked" class="locked-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
+      Hoàn thành vòng 3 ở Part 5 để mở bài mẫu và thang điểm.
+    </div>
+    <div id="sampleContent" hidden>
+      <div class="card essay-box">
+        <h3>Bài mẫu hoàn chỉnh <span style="font-weight:400; color:var(--ink-dim); font-size:13px;">(136 từ · in đậm = từ nối)</span></h3>
+        <p>The pictures illustrate the process of making pancakes.</p>
+        <p>Overall, there are nine stages, beginning with weighing the ingredients and ending with serving the pancakes. The process can be divided into two main phases: preparing the batter and cooking the pancakes.</p>
+        <p><strong>In the first stage,</strong> all the ingredients are weighed carefully. Flour, salt and sugar are <strong>then</strong> put into a large bowl, <strong>while</strong> the egg, milk and oil are combined in a separate bowl. <strong>Next,</strong> the liquid ingredients are slowly added to the flour mixture and stirred constantly <strong>until</strong> a smooth, thick batter is formed.</p>
+        <p><strong>In the cooking phase,</strong> a frying pan is heated and lightly greased with butter. <strong>Once</strong> the butter has melted, a large spoonful of batter is poured into the pan and cooked <strong>until</strong> the edges turn brown. <strong>At this point,</strong> the pancake is turned over and cooked for about one more minute. It is <strong>then</strong> placed on a plate and covered to keep it warm <strong>while</strong> the remaining pancakes are made. <strong>Finally,</strong> the pancakes are served with syrup, sugar and lemon, or fruit.</p>
+      </div>
+      <div class="card">
+        <h3>Thang chấm 10 điểm</h3>
+        <div class="table-wrap"><table class="data rubric">
+          <tr><th>Tiêu chí</th><th>Điểm</th><th>Đạt tối đa khi</th><th>Trừ điểm khi</th></tr>
+          <tr><td>Đủ bước, đúng đoạn</td><td>3</td><td>Đủ 9 bước, đúng thứ tự, chia đúng 2 đoạn</td><td>Thiếu mỗi bước −0,5; sai thứ tự −0,5; không chia đoạn −1</td></tr>
+          <tr><td>Câu bị động</td><td>3</td><td>Tất cả các bước dùng bị động đúng</td><td>Mỗi lỗi be / V3 / is–are −0,5 (tối đa −3)</td></tr>
+          <tr><td>Từ nối, mạch lạc</td><td>2</td><td>Ít nhất 4 từ nối khác nhau, dùng đúng</td><td>Lặp "then" quá 3 lần −0,5; thiếu từ nối −1</td></tr>
+          <tr><td>Văn phong, từ vựng</td><td>2</td><td>Không có you/we, không ý kiến, dùng batter, separate, constantly…</td><td>Còn you/we −0,5; có ý kiến cá nhân −0,5; chép nguyên câu văn nói −1</td></tr>
+        </table></div>
+      </div>
+      <div class="card">
+        <h3>Mã sửa lỗi (GV dùng khi chấm)</h3>
+        <div class="table-wrap"><table class="data">
+          <tr><th>Mã</th><th>Lỗi</th><th>Ví dụ sai → đúng</th></tr>
+          <tr><td><span class="code-chip">PV</span></td><td>Sai/thiếu bị động</td><td>Flour put in a bowl → Flour <b>is</b> put in a bowl</td></tr>
+          <tr><td><span class="code-chip">V3</span></td><td>Sai dạng phân từ</td><td>is putted → is put</td></tr>
+          <tr><td><span class="code-chip">SV</span></td><td>Sai is/are</td><td>The egg, milk and oil is mixed → <b>are</b> mixed</td></tr>
+          <tr><td><span class="code-chip">ST</span></td><td>Thiếu bước</td><td>Thiếu "heat and grease the pan"</td></tr>
+          <tr><td><span class="code-chip">IF</span></td><td>Văn nói, thân mật</td><td>you flip it over → the pancake is turned over</td></tr>
+          <tr><td><span class="code-chip">OP</span></td><td>Ý kiến cá nhân</td><td>They are delicious → bỏ</td></tr>
+        </table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= REPORT ================= -->
+  <section class="part" id="report">
+    <div class="part-head">
+      <div class="eyebrow">Báo cáo điểm</div>
+      <h2>Điểm đã gửi lên Google Form</h2>
+      <p>Khi bạn bấm <b>"Lưu bản cuối"</b> ở Part 5 (vòng 3 — Editing), điểm Part 1–4 và toàn bộ đoạn văn Part 5 sẽ tự động gửi lên Google Form — không cần làm gì thêm. Phần Part 5 gửi nguyên văn bài viết (kèm điểm gợi ý tự động) để GV chấm tay. Bảng bên dưới là bản xem lại; dùng nút "Gửi lại" nếu bạn sửa bài và muốn cập nhật.</p>
+    </div>
+    <div class="card">
+      <h3>Tổng hợp điểm <span id="reportNameTag" style="font-weight:400; color:var(--ink-dim); font-size:14px;"></span></h3>
+      <div class="table-wrap"><table class="data" id="reportTable"></table></div>
+      <div id="sendStatus" class="send-status"></div>
+      <div class="btn-row">
+        <button id="reportResend" class="btn btn-primary">Gửi lại báo cáo điểm</button>
+        <a id="reportFormLink" class="btn" href="#" target="_blank" rel="noopener">Mở Google Form (thủ công)</a>
+      </div>
+      <p style="font-size:13px; color:var(--ink-dim); margin-top:10px;">Nếu nút "Gửi lại" không hoạt động (ví dụ trình duyệt chặn), dùng link "Mở Google Form (thủ công)" — form sẽ mở sẵn điểm, bạn chỉ cần bấm "Gửi" trên đó.</p>
+    </div>
+  </section>
+
+</main>
+<iframe name="hiddenReportFrame" title="report-sink" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;"></iframe>
+
+<footer class="foot">
+  Pre-IELTS (A2–B1) · Bài tập online dựa trên Track 13 "Campus Cook-in" · Tiến độ được lưu tự động trên trình duyệt này.
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- photos & icons ---------- */
+  var PHOTO_SRC = { A:'assets/images/A.png', B:'assets/images/B.png', C:'assets/images/C.png', D:'assets/images/D.png', E:'assets/images/E.png', F:'assets/images/F.png', G:'assets/images/G.png' };
+  var ICON = {
+    heat: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="29" cy="36" rx="18" ry="8"/><path d="M47 34h10"/><path d="M15 51c3.5-3 3.5-6.5 0-9.5M27 51c3.5-3 3.5-6.5 0-9.5M39 51c3.5-3 3.5-6.5 0-9.5"/></svg>',
+    plate: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="32" cy="45" rx="23" ry="7"/><path d="M11 41c0-10 9.5-19 21-19s21 9 21 19"/><ellipse cx="32" cy="41" rx="10" ry="3.5"/></svg>'
+  };
+  var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  var LOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>';
+
+  /* ---------- step data (correct order = id 1..9) ---------- */
+  var STEPS = [
+    { id:1, photo:'D', vi:'Cân nguyên liệu',
+      original:"So please make sure you weigh everything carefully.",
+      phrases:["weigh","all the ingredients","carefully"], starter:"In the first stage, · First,",
+      fill:"In the first stage, all the {1} are {2} carefully.",
+      ans:{1:["ingredients"],2:["weighed"]},
+      keywords:"first stage / ingredients / weigh / carefully",
+      model:"In the first stage, all the ingredients are weighed carefully.",
+      tip:'"all the ingredients" số nhiều nên dùng are weighed.' },
+    { id:2, photo:'E', vi:'Cho bột khô vào tô',
+      original:"First you put the flour, salt and sugar in a large bowl.",
+      phrases:["put ... into","a large bowl"], starter:"… are then …",
+      fill:"Flour, salt and sugar are then {1} into a large {2}.",
+      ans:{1:["put","placed"],2:["bowl"]},
+      keywords:"flour, salt, sugar / then / put / large bowl",
+      model:"Flour, salt and sugar are then put into a large bowl.",
+      tip:'"then" đứng sau be: are then put. put – put – put là động từ bất quy tắc.' },
+    { id:3, photo:'A', vi:'Trộn nguyên liệu lỏng',
+      original:"Next, you mix the egg, milk and oil in another bowl.",
+      phrases:["combine","a separate bowl"], starter:"At the same time, · Meanwhile,",
+      fill:"At the same time, the egg, milk and oil are {1} in a {2} bowl.",
+      ans:{1:["combined","mixed"],2:["separate"]},
+      keywords:"at the same time / egg, milk, oil / combine / separate bowl",
+      model:"At the same time, the egg, milk and oil are combined in a separate bowl.",
+      tip:'At the same time = hai việc làm song song. Ở Part 5, câu 2 và 3 sẽ được nối bằng "while".' },
+    { id:4, photo:'G', vi:'Trộn thành bột sệt',
+      original:"Then, slowly add the liquid ingredients to the flour mixture… Make sure you stir all the time.",
+      phrases:["slowly add","stir constantly","a smooth, thick batter is formed"], starter:"Next, · After that,",
+      fill:"Next, the liquid ingredients are slowly {1} to the flour mixture and {2} constantly until a smooth, thick batter is formed.",
+      ans:{1:["added"],2:["stirred"]},
+      keywords:"next / liquid ingredients / add, stir / until / smooth, thick batter",
+      model:"Next, the liquid ingredients are slowly added to the flour mixture and stirred constantly until a smooth, thick batter is formed.",
+      tip:'Một chủ ngữ, hai động từ bị động: are slowly added … and stirred (không lặp "are").' },
+    { id:5, photo:null, vi:'Làm nóng, tráng bơ chảo',
+      original:"We start by heating the frying pan and greasing it lightly with a little butter.",
+      phrases:["heat","lightly grease ... with butter"], starter:"In the cooking phase,",
+      fill:"In the cooking phase, a frying pan is {1} and lightly {2} with butter.",
+      ans:{1:["heated"],2:["greased"]},
+      keywords:"cooking phase / frying pan / heat, grease / butter",
+      model:"In the cooking phase, a frying pan is heated and lightly greased with butter.",
+      tip:'Mở đầu đoạn 2 bằng cụm báo giai đoạn mới: In the cooking phase.' },
+    { id:6, photo:'F', vi:'Đổ bột, nướng',
+      original:"When the butter's melted, we pour a large spoonful of the pancake mix into the pan and cook it until the edges are brown.",
+      phrases:["a large spoonful of batter","pour ... into","until the edges turn brown"], starter:"Once the butter has melted,",
+      fill:"Once the butter has melted, a large spoonful of batter is {1} into the pan and {2} until the edges turn brown.",
+      ans:{1:["poured"],2:["cooked"]},
+      keywords:"once / butter, melt / batter / pour, cook / edges, brown",
+      model:"Once the butter has melted, a large spoonful of batter is poured into the pan and cooked until the edges turn brown.",
+      tip:'Once + hiện tại hoàn thành (has melted) = sau khi … xong. "the edges turn brown" dùng chủ động vì bánh tự đổi màu, không ai làm.' },
+    { id:7, photo:'C', vi:'Lật bánh',
+      original:"At that point, flip the pancake over and cook for a minute or so longer.",
+      phrases:["turn over","for about one more minute"], starter:"At this point,",
+      fill:"At this point, the pancake is {1} over and cooked for about one more {2}.",
+      ans:{1:["turned","flipped"],2:["minute"]},
+      keywords:"at this point / pancake / turn over / one more minute",
+      model:"At this point, the pancake is turned over and cooked for about one more minute.",
+      tip:'turn over thay cho flip; "for about one more minute" thay cho "a minute or so longer".' },
+    { id:8, photo:null, vi:'Để ra đĩa, đậy lại',
+      original:"Finally, put the pancake on a plate and cover it up to keep warm, and make the next one.",
+      phrases:["place on a plate","keep it warm","the remaining pancakes"], starter:"It is then …",
+      fill:"It is then {1} on a plate and {2} to keep it warm while the remaining pancakes are made.",
+      ans:{1:["placed","put"],2:["covered"]},
+      keywords:"then / place / plate / cover / keep warm",
+      model:"It is then placed on a plate and covered to keep it warm while the remaining pancakes are made.",
+      tip:'Dùng "It" để không lặp "the pancake". Sau "while" vẫn dùng bị động: are made.' },
+    { id:9, photo:'B', vi:'Dọn bánh ra',
+      original:"When all your pancakes are ready, you can serve them up with syrup or sugar and lemon, or even fruit.",
+      phrases:["serve with","syrup, sugar and lemon, or fruit"], starter:"Finally,",
+      fill:"Finally, the pancakes are {1} with syrup, sugar and lemon, or {2}.",
+      ans:{1:["served"],2:["fruit"]},
+      keywords:"finally / pancakes / serve / syrup, sugar and lemon, fruit",
+      model:"Finally, the pancakes are served with syrup, sugar and lemon, or fruit.",
+      tip:'Finally chỉ dùng một lần, cho bước cuối cùng.' }
+  ];
+  var NOPHOTO_LABEL = { 5:'Heat the frying pan and grease it with butter.', 8:'Put the pancake on a plate and cover it to keep warm.' };
+
+  var TRANSCRIPT = "Hi, and welcome to ‘Campus Cook-in’, our daily TV programme for students who want a bit of variety in their meals. Are you bored with cereal for breakfast? Well, today, we're going to tell you how to make pancakes. They're cheap and quick and very easy to make. You only need flour, milk, sugar, salt, oil and an egg. The full recipe's on the university website – just follow the link. So, here we go …|||Before you start, it's important to have the exact <u>quantities</u>, otherwise your pancakes won't cook properly. So please make sure you <u>weigh</u> everything carefully. Everyone ready? OK.|||<u>First</u> you put the flour, salt and sugar in a large bowl. <u>Next</u>, you <u>mix</u> the egg, milk and oil in another bowl. <u>Then</u>, slowly <u>add</u> the liquid ingredients to the flour mixture, mixing well until it has a smooth, thick <u>consistency</u>. Make sure you <u>stir</u> all the time.|||OK? Now we're ready to cook our pancakes. We start by <u>heating</u> the frying pan and <u>greasing</u> it lightly with a little butter. <u>When</u> the butter's melted, we <u>pour</u> a large spoonful of the pancake mix into the pan and cook it until the edges are <u>brown</u>. <u>At that point</u>, <u>flip</u> the pancake over and cook for a minute or so longer. <u>Finally</u>, put the pancake on a plate and <u>cover</u> it up to keep warm, and make the next one. When all your pancakes are ready, you can <u>serve</u> them up with syrup or sugar and lemon, or even fruit. Delicious! Happy Eating!";
+
+  var GAP_ANS = {1:["quantities"],2:["weigh"],3:["first"],4:["next"],5:["mix"],6:["then"],7:["add"],8:["consistency"],9:["stir"],10:["heating"],11:["greasing"],12:["when"],13:["pour"],14:["brown"],15:["at that point"],16:["flip"],17:["finally"],18:["cover"],19:["serve"]};
+  var GAP_TEMPLATE = "Before you start, it's important to have the exact ({1}), otherwise your pancakes won't cook properly. So please make sure you ({2}) everything carefully. Everyone ready? OK.\n\n({3}) you put the flour, salt and sugar in a large bowl. ({4}), you ({5}) the egg, milk and oil in another bowl. ({6}), slowly ({7}) the liquid ingredients to the flour mixture, mixing well until it has a smooth, thick ({8}). Make sure you ({9}) all the time.\n\nOK? Now we're ready to cook our pancakes. We start by ({10}) the frying pan and ({11}) it lightly with a little butter. ({12}) the butter's melted, we ({13}) a large spoonful of the pancake mix into the pan and cook it until the edges are ({14}). ({15}), ({16}) the pancake over and cook for a minute or so longer. ({17}), put the pancake on a plate and ({18}) it up to keep warm, and make the next one. When all your pancakes are ready, you can ({19}) them up with syrup or sugar and lemon, or even fruit.";
+
+  var P2B_OPTIONS = [
+    {k:'A', t:'Heat the frying pan and grease it with butter.', correct:true},
+    {k:'B', t:'Cut the bananas into small pieces.', correct:false},
+    {k:'C', t:'Put the pancake on a plate and cover it to keep warm.', correct:true},
+    {k:'D', t:'Leave the mixture in the fridge for an hour.', correct:false},
+    {k:'E', t:'Wash the frying pan with hot water.', correct:false}
+  ];
+
+  var P3_QUIZ = [
+    { q:'How many stages are there in the process?', opts:['7','9','2'], correct:1,
+      explain:'Chỉ có 7 tranh, nhưng có 9 bước — 2 bước (5 và 8) không có tranh minh hoạ. Đừng chỉ đếm tranh.' },
+    { q:'What are the two main phases?', opts:['weighing and serving','preparing the batter and cooking the pancakes','mixing and flipping'], correct:1,
+      explain:'Hai đoạn thân bài: Body 1 chuẩn bị bột, Body 2 nướng bánh.' },
+    { q:'Which stages go in Body paragraph 1?', opts:['Stages 1–4','Stages 1–2','Stages 5–9'], correct:0,
+      explain:'Body 1 gồm 4 bước chuẩn bị bột (cân → bột khô vào tô → trộn lỏng → trộn sệt).' },
+    { q:'Which sentence should NOT be in a Task 1 essay?', opts:['The batter is poured into the pan.','In my opinion, pancakes are cheap and delicious.','Finally, the pancakes are served with fruit.'], correct:1,
+      explain:'Task 1 chỉ mô tả quy trình, không đưa ý kiến cá nhân ("In my opinion…", "delicious").' }
+  ];
+
+  /* ---------- state ---------- */
+  var STORAGE_KEY = 'pancakeLab_v1';
+  function freshState(){
+    var p4 = {};
+    STEPS.forEach(function(s){ p4[s.id] = { written:'', attempted:false, saved:'' }; });
+    return {
+      p1: { order: shuffled(STEPS.filter(function(s){return s.photo;}).map(function(s){return s.id;})), submitted:false, score:0 },
+      p2a: { answers:{}, submitted:false, score:0 },
+      p2b: { selected:[], submitted:false, score:0 },
+      p2c: { order: shuffled(STEPS.map(function(s){return s.id;})), submitted:false, score:0 },
+      p2all: false,
+      p3: { answers:{}, submitted:false, score:0 },
+      p4: p4,
+      p5: { round:1, body1:'', body2:'', c2:[false,false,false,false,false,false,false], c3:[false,false,false,false,false,false,false], submitted3:false, touched:false, finalSaved:false },
+      report: { name:'', lastSentAt:0 }
+    };
+  }
+  function shuffled(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+    // avoid accidentally-correct shuffle
+    var sorted = arr.slice().sort(function(x,y){return x-y;});
+    if(a.join(',')===sorted.join(',')){ a.reverse(); }
+    return a;
+  }
+  var state = loadState();
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return freshState();
+      var parsed = JSON.parse(raw);
+      var fresh = freshState();
+      // shallow-merge to tolerate schema drift
+      return Object.assign(fresh, parsed, {
+        p4: Object.assign(fresh.p4, parsed.p4 || {}),
+        p5: Object.assign(fresh.p5, parsed.p5 || {}),
+        report: Object.assign(fresh.report, parsed.report || {})
+      });
+    }catch(e){ return freshState(); }
+  }
+  function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+
+  function norm(s){ return (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ').replace(/[.,!?]+$/,''); }
+  function matches(val, accepted){ var n = norm(val); return accepted.some(function(a){ return norm(a) === n; }); }
+  function stepById(id){ return STEPS.filter(function(s){ return s.id===id; })[0]; }
+
+  /* ---------- nav ---------- */
+  var PARTS = [
+    {id:'part1', label:'Part 1', num:'1'},
+    {id:'part2', label:'Part 2', num:'2'},
+    {id:'part3', label:'Part 3', num:'3'},
+    {id:'part4', label:'Part 4', num:'4'},
+    {id:'part5', label:'Part 5', num:'5'},
+    {id:'sample', label:'Bài mẫu', num:'★'},
+    {id:'report', label:'Báo cáo điểm', num:'✎'}
+  ];
+  var activePart = 'part1';
+  function renderNav(){
+    var row = document.getElementById('navRow');
+    row.innerHTML = '';
+    PARTS.forEach(function(p){
+      var done = isPartDone(p.id);
+      var btn = document.createElement('button');
+      btn.className = 'navtab' + (p.id===activePart ? ' active' : '');
+      btn.innerHTML = (done ? '<span class="check">'+CHECK_SVG+'</span>' : '<span class="num">'+p.num+'</span>') + '<span>'+p.label+'</span>';
+      btn.addEventListener('click', function(){ setActivePart(p.id); });
+      row.appendChild(btn);
+    });
+  }
+  function isPartDone(id){
+    if(id==='part1') return state.p1.submitted;
+    if(id==='part2') return state.p2all;
+    if(id==='part3') return state.p3.submitted;
+    if(id==='part4') return STEPS.every(function(s){ return !!state.p4[s.id].saved; });
+    if(id==='part5') return state.p5.finalSaved;
+    if(id==='sample') return false;
+    return false;
+  }
+  function setActivePart(id){
+    activePart = id;
+    document.querySelectorAll('section.part').forEach(function(sec){ sec.classList.toggle('active', sec.id===id); });
+    renderNav();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  /* ---------- generic sortable list ---------- */
+  function cardHTML(stepId, idx, total){
+    var s = stepById(stepId);
+    var icon = s.photo ? ('<img src="'+PHOTO_SRC[s.photo]+'" alt="Tranh '+s.photo+' — '+s.vi+'">') : ICON[stepId===5?'heat':'plate'];
+    var letter = s.photo ? s.photo : '—';
+    return (
+      '<div class="pos mono">'+(idx+1)+'</div>'+
+      '<div class="icon-tile">'+icon+'</div>'+
+      '<div class="label"><div class="let">'+(s.photo?('Tranh '+letter):'Không có tranh')+'</div><div class="vi">'+s.vi+'</div></div>'+
+      '<div class="reorder-btns">'+
+        '<button type="button" data-dir="up" '+(idx===0?'disabled':'')+' aria-label="Di chuyển lên">▲</button>'+
+        '<button type="button" data-dir="down" '+(idx===total-1?'disabled':'')+' aria-label="Di chuyển xuống">▼</button>'+
+      '</div>'
+    );
+  }
+  function renderSortable(containerEl, order, onReorder){
+    containerEl.innerHTML = '';
+    order.forEach(function(stepId, idx){
+      var card = document.createElement('div');
+      card.className = 'sort-card';
+      card.draggable = true;
+      card.dataset.id = stepId;
+      card.innerHTML = cardHTML(stepId, idx, order.length);
+      card.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text/plain', String(stepId)); card.classList.add('dragging'); });
+      card.addEventListener('dragend', function(){ card.classList.remove('dragging'); });
+      card.addEventListener('dragover', function(e){ e.preventDefault(); });
+      card.addEventListener('drop', function(e){
+        e.preventDefault();
+        var draggedId = parseInt(e.dataTransfer.getData('text/plain'),10);
+        if(draggedId===stepId) return;
+        var from = order.indexOf(draggedId), to = order.indexOf(stepId);
+        order.splice(from,1); order.splice(to,0,draggedId);
+        onReorder(order);
+      });
+      card.querySelector('[data-dir="up"]').addEventListener('click', function(){
+        if(idx===0) return;
+        var t=order[idx-1]; order[idx-1]=order[idx]; order[idx]=t; onReorder(order);
+      });
+      card.querySelector('[data-dir="down"]').addEventListener('click', function(){
+        if(idx===order.length-1) return;
+        var t=order[idx+1]; order[idx+1]=order[idx]; order[idx]=t; onReorder(order);
+      });
+      containerEl.appendChild(card);
+    });
+  }
+  function markSortableResult(containerEl, order, target){
+    Array.prototype.forEach.call(containerEl.children, function(card, idx){
+      var ok = order[idx]===target[idx];
+      card.classList.remove('ok','bad');
+      card.classList.add(ok?'ok':'bad');
+    });
+  }
+
+  /* ---------- PART 1 ---------- */
+  var p1Target = STEPS.filter(function(s){return s.photo;}).map(function(s){return s.id;}); // ascending id = correct order
+  function renderPart1(){
+    renderSortable(document.getElementById('p1List'), state.p1.order, function(order){
+      state.p1.order = order; saveState(); renderPart1();
+    });
+  }
+  document.getElementById('p1Check').addEventListener('click', function(){
+    var order = state.p1.order;
+    markSortableResult(document.getElementById('p1List'), order, p1Target);
+    var score = order.filter(function(id,idx){return id===p1Target[idx];}).length;
+    var badge = document.getElementById('p1Score');
+    badge.style.display = 'inline-flex';
+    badge.className = 'score-badge ' + (score===p1Target.length?'good':'mid');
+    badge.textContent = 'Đúng vị trí: ' + score + '/' + p1Target.length;
+    state.p1.submitted = true; state.p1.score = score; saveState(); renderNav(); renderReport();
+  });
+
+  /* ---------- PART 2A ---------- */
+  function renderGapText(){
+    var box = document.getElementById('gapText');
+    box.innerHTML = '';
+    var parts = GAP_TEMPLATE.split(/\n\n/);
+    parts.forEach(function(para){
+      var p = document.createElement('p');
+      var segs = para.split(/(\(\{\d+\}\))/g);
+      segs.forEach(function(seg){
+        var m = seg.match(/^\(\{(\d+)\}\)$/);
+        if(m){
+          var n = m[1];
+          var input = document.createElement('input');
+          input.type='text'; input.className='gap'; input.dataset.n=n;
+          input.setAttribute('aria-label','Chỗ trống '+n);
+          input.value = state.p2a.answers[n] || '';
+          input.addEventListener('input', function(){ state.p2a.answers[n]=input.value; saveState(); });
+          p.appendChild(document.createTextNode(' ('+n+') '));
+          p.appendChild(input);
+        } else if(seg){ p.appendChild(document.createTextNode(seg)); }
+      });
+      box.appendChild(p);
+    });
+  }
+  document.getElementById('p2aCheck').addEventListener('click', function(){
+    var score = 0, total = 19;
+    document.querySelectorAll('#gapText input.gap').forEach(function(inp){
+      var n = inp.dataset.n;
+      var ok = matches(inp.value, GAP_ANS[n]);
+      inp.classList.remove('ok','bad'); inp.classList.add(ok?'ok':'bad');
+      if(ok) score++;
+    });
+    var badge = document.getElementById('p2aScore');
+    badge.style.display='inline-flex';
+    badge.className = 'score-badge ' + (score===total?'good':'mid');
+    badge.textContent = score + '/' + total + ' đúng';
+    state.p2a.submitted = true; state.p2a.score = score; saveState(); renderReport();
+  });
+
+  /* ---------- PART 2B ---------- */
+  function renderP2B(){
+    var box = document.getElementById('p2bOptions');
+    box.innerHTML = '';
+    P2B_OPTIONS.forEach(function(opt){
+      var label = document.createElement('label');
+      var checked = state.p2b.selected.indexOf(opt.k) > -1;
+      label.innerHTML = '<input type="checkbox" value="'+opt.k+'" '+(checked?'checked':'')+'> <span><b>'+opt.k+'.</b> '+opt.t+'</span>';
+      label.querySelector('input').addEventListener('change', function(e){
+        var sel = state.p2b.selected;
+        if(e.target.checked){ if(sel.indexOf(opt.k)===-1) sel.push(opt.k); }
+        else { state.p2b.selected = sel.filter(function(x){return x!==opt.k;}); }
+        saveState();
+      });
+      box.appendChild(label);
+    });
+  }
+  document.getElementById('p2bCheck').addEventListener('click', function(){
+    var labels = document.querySelectorAll('#p2bOptions label');
+    var correctSet = P2B_OPTIONS.filter(function(o){return o.correct;}).map(function(o){return o.k;});
+    var score = 0;
+    labels.forEach(function(label, i){
+      var opt = P2B_OPTIONS[i];
+      var picked = state.p2b.selected.indexOf(opt.k) > -1;
+      label.classList.remove('ok','bad');
+      if(opt.correct && picked){ label.classList.add('ok'); score++; }
+      else if(opt.correct && !picked){ label.classList.add('bad'); }
+      else if(!opt.correct && picked){ label.classList.add('bad'); }
+    });
+    var badge = document.getElementById('p2bScore');
+    badge.style.display='inline-flex';
+    badge.className = 'score-badge ' + (score===correctSet.length?'good':'mid');
+    badge.textContent = score + '/' + correctSet.length + ' đúng';
+    state.p2b.submitted = true; state.p2b.score = score; saveState(); renderReport();
+  });
+
+  /* ---------- PART 2C ---------- */
+  var p2cTarget = STEPS.map(function(s){return s.id;});
+  function renderPart2C(){
+    renderSortable(document.getElementById('p2cList'), state.p2c.order, function(order){
+      state.p2c.order = order; saveState(); renderPart2C();
+    });
+  }
+  document.getElementById('p2cCheck').addEventListener('click', function(){
+    var order = state.p2c.order;
+    markSortableResult(document.getElementById('p2cList'), order, p2cTarget);
+    var score = order.filter(function(id,idx){return id===p2cTarget[idx];}).length;
+    var badge = document.getElementById('p2cScore');
+    badge.style.display='inline-flex';
+    badge.className = 'score-badge ' + (score===p2cTarget.length?'good':'mid');
+    badge.textContent = 'Đúng vị trí: ' + score + '/' + p2cTarget.length;
+    state.p2c.submitted = true; state.p2c.score = score; saveState(); renderReport();
+  });
+
+  /* ---------- PART 2 submit all ---------- */
+  document.getElementById('p2SubmitAll').addEventListener('click', function(){
+    document.getElementById('p2aCheck').click();
+    document.getElementById('p2bCheck').click();
+    document.getElementById('p2cCheck').click();
+    state.p2all = true; saveState();
+    document.getElementById('p2Reveal').hidden = false;
+    document.getElementById('p2Locked').style.display = 'none';
+    renderTranscriptAndAnswers();
+    renderNav(); renderReport();
+  });
+
+  function renderTranscriptAndAnswers(){
+    var box = document.getElementById('transcriptBox');
+    box.innerHTML = TRANSCRIPT.split('|||').map(function(p){ return '<p>'+p+'</p>'; }).join('');
+
+    var t1 = document.getElementById('p1AnswerTable');
+    var rows = '<tr><th>Thứ tự</th><th>Tranh</th><th>Nội dung</th><th>Câu tín hiệu</th></tr>';
+    STEPS.filter(function(s){return s.photo;}).forEach(function(s,i){
+      rows += '<tr><td>'+(i+1)+'</td><td>'+s.photo+'</td><td>'+s.vi+'</td><td><i>'+s.original+'</i></td></tr>';
+    });
+    t1.innerHTML = rows;
+
+    var t2 = document.getElementById('p2aAnswerTable');
+    var rows2 = '<tr><th>#</th><th>Đáp án</th></tr>';
+    for(var n=1;n<=19;n++){ rows2 += '<tr><td>('+n+')</td><td class="mono">'+GAP_ANS[n][0]+'</td></tr>'; }
+    t2.innerHTML = rows2;
+  }
+
+  /* ---------- PART 3 ---------- */
+  function renderPart3(){
+    var box = document.getElementById('p3Quiz');
+    box.innerHTML = '';
+    P3_QUIZ.forEach(function(item, qi){
+      var wrap = document.createElement('div');
+      wrap.className = 'mcq-q';
+      var optsHTML = item.opts.map(function(opt, oi){
+        var checked = state.p3.answers[qi]===oi;
+        return '<label data-oi="'+oi+'"><input type="radio" name="p3q'+qi+'" value="'+oi+'" '+(checked?'checked':'')+'> <span>'+opt+'</span></label>';
+      }).join('');
+      wrap.innerHTML = '<div class="q">'+(qi+1)+'. '+item.q+'</div><div class="mcq">'+optsHTML+'</div><div class="explain" id="p3ex'+qi+'">'+item.explain+'</div>';
+      box.appendChild(wrap);
+      wrap.querySelectorAll('input').forEach(function(inp, oi){
+        inp.addEventListener('change', function(){ state.p3.answers[qi]=oi; saveState(); });
+      });
+    });
+  }
+  document.getElementById('p3Check').addEventListener('click', function(){
+    var score = 0;
+    P3_QUIZ.forEach(function(item, qi){
+      var wrap = document.querySelectorAll('.mcq-q')[qi];
+      var labels = wrap.querySelectorAll('.mcq label');
+      var picked = state.p3.answers[qi];
+      labels.forEach(function(label, oi){
+        label.classList.remove('ok','bad');
+        if(oi===item.correct) label.classList.add('ok');
+        else if(oi===picked) label.classList.add('bad');
+      });
+      document.getElementById('p3ex'+qi).classList.add('show');
+      if(picked===item.correct) score++;
+    });
+    var badge = document.getElementById('p3Score');
+    badge.style.display='inline-flex';
+    badge.className = 'score-badge ' + (score===P3_QUIZ.length?'good':'mid');
+    badge.textContent = score + '/' + P3_QUIZ.length + ' đúng';
+    state.p3.submitted = true; state.p3.score = score; saveState(); renderNav(); renderReport();
+  });
+
+  /* ---------- PART 4 ---------- */
+  var p4ActiveStep = 1, p4ActiveRung = 1;
+  function renderP4StepList(){
+    var box = document.getElementById('p4StepList');
+    box.innerHTML = '';
+    STEPS.forEach(function(s){
+      var done = !!state.p4[s.id].saved;
+      var item = document.createElement('div');
+      item.className = 'step-item' + (s.id===p4ActiveStep?' active':'') + (done?' done':'');
+      item.innerHTML = '<span class="n">'+(done?'✓':s.id)+'</span><span class="t">'+s.vi+'</span>';
+      item.addEventListener('click', function(){ p4ActiveStep = s.id; p4ActiveRung=1; renderP4(); });
+      box.appendChild(item);
+    });
+  }
+  function rungUnlocked4(s){
+    return state.p4[s.id].attempted;
+  }
+  function hintFrame(fill){
+    return escapeHtml(fill).replace(/\{1\}/g,'<b>……</b>').replace(/\{2\}/g,'<b>……</b>');
+  }
+  function renderP4Panel(){
+    var s = stepById(p4ActiveStep);
+    var d = state.p4[s.id];
+    var panel = document.getElementById('p4Panel');
+    var unlocked = rungUnlocked4(s);
+    var tabs = [
+      {n:1, label:'1 · Quan sát'},
+      {n:2, label:'2 · Viết câu'},
+      {n:3, label:'3 · Câu mẫu'}
+    ];
+    var tabsHTML = tabs.map(function(t){
+      var locked = t.n===3 && !unlocked;
+      return '<button class="rung-tab'+(p4ActiveRung===t.n?' active':'')+'" data-n="'+t.n+'" '+(locked?'disabled':'')+'>'+
+        (locked ? LOCK_SVG : '') + t.label + '</button>';
+    }).join('');
+
+    var body = '';
+    if(p4ActiveRung===1){
+      var photoHTML = s.photo
+        ? '<img class="step-photo" src="'+PHOTO_SRC[s.photo]+'" alt="Tranh '+s.photo+' — '+s.vi+'">'
+        : '<div class="no-photo">'+ICON.plate+'</div>';
+      body += '<div class="step-photo-wrap"><div>'+photoHTML+'</div><div class="step-obs-text">';
+      body += '<div class="orig-quote">“'+s.original+'”</div>';
+      body += '<div><span class="field-label" style="display:inline;">Cụm từ hữu ích:</span><div>'+s.phrases.map(function(p){return '<span class="phrase-chip">'+p+'</span>';}).join('')+'</div></div>';
+      body += '<div class="starter-row"><span class="field-label" style="display:inline;">Cách mở câu:</span> <span class="mono" style="font-size:13.5px; color:var(--maple);">'+s.starter+'</span></div>';
+      body += '</div></div>';
+    } else if(p4ActiveRung===2){
+      body += '<div class="hint-note"><div class="lbl">Gợi ý cấu trúc (bị động is/are + V3)</div><div class="frame">'+hintFrame(s.fill)+'</div></div>';
+      body += '<div class="keyword-row"><span class="field-label" style="display:inline;">Từ khoá:</span> <span class="mono" style="font-size:13.5px; color:var(--maple);">'+s.keywords+'</span></div>';
+      body += '<label class="field-label">Write the whole sentence using the passive (is / are + V3)</label>';
+      body += '<textarea class="ta" id="p4Written" rows="2">'+escapeHtml(d.written)+'</textarea>';
+      body += '<div class="btn-row"><button class="btn" id="p4Done">Xong, so sánh với câu mẫu</button></div>';
+    } else if(p4ActiveRung===3){
+      if(unlocked){
+        body += '<div class="model-box"><div class="lbl">Câu mẫu</div><div class="sent">'+s.model+'</div></div>';
+        body += '<div class="tip-box">💡 '+s.tip+'</div>';
+        body += '<div class="btn-row"><button class="btn btn-primary" id="p4Save">Lưu câu cho Part 5</button>'+(d.saved?'<span class="score-badge good">Đã lưu ✓</span>':'')+'</div>';
+      } else {
+        body += '<div class="locked-box">'+LOCK_SVG+' Thử viết câu ở nấc 2 trước để mở câu mẫu.</div>';
+      }
+    }
+
+    panel.innerHTML =
+      '<h3>Bước '+s.id+' — '+s.vi+(s.photo?' <span class="meta-chip" style="margin-left:6px;">Tranh '+s.photo+'</span>':' <span class="meta-chip" style="margin-left:6px;">Không có tranh</span>')+'</h3>'+
+      '<div class="rung-tabs">'+tabsHTML+'</div>'+
+      '<div>'+body+'</div>';
+
+    panel.querySelectorAll('.rung-tab').forEach(function(btn){
+      btn.addEventListener('click', function(){ p4ActiveRung = parseInt(btn.dataset.n,10); renderP4(); });
+    });
+
+    if(p4ActiveRung===2){
+      document.getElementById('p4Written').addEventListener('input', function(e){ d.written = e.target.value; saveState(); });
+      document.getElementById('p4Done').addEventListener('click', function(){
+        d.attempted = true; saveState(); renderP4StepList();
+        p4ActiveRung = 3; renderP4();
+      });
+    }
+    if(p4ActiveRung===3 && unlocked){
+      document.getElementById('p4Save').addEventListener('click', function(){
+        d.saved = d.written && d.written.trim() ? d.written.trim() : s.model;
+        saveState(); renderP4StepList(); renderNav(); renderP4Panel(); renderReport();
+      });
+    }
+  }
+  function renderP4(){ renderP4StepList(); renderP4Panel(); }
+  function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  /* ---------- PART 5 auto-grader (dựa trên mã sửa lỗi) ---------- */
+  var STEP_CHECK = [
+    { id:1, body:1, anchors:['ingredient'], verbs:[ {forms:['weighed'], expectBe:'are'} ] },
+    { id:2, body:1, anchors:['flour','salt','sugar'], verbs:[ {forms:['put','placed'], expectBe:'are'} ] },
+    { id:3, body:1, anchors:['egg','milk','oil'], verbs:[ {forms:['combined','mixed'], expectBe:'are'} ] },
+    { id:4, body:1, anchors:['liquid ingredient','smooth, thick','smooth thick','thick batter'], verbs:[ {forms:['added'], expectBe:'are'}, {forms:['stirred'], expectBe:'are'} ] },
+    { id:5, body:2, anchors:['frying pan','cooking phase'], verbs:[ {forms:['heated'], expectBe:'is'}, {forms:['greased'], expectBe:'is'} ] },
+    { id:6, body:2, anchors:['spoonful','poured','pour into'], verbs:[ {forms:['poured'], expectBe:'is'}, {forms:['cooked'], expectBe:'is'} ] },
+    { id:7, body:2, anchors:['one more minute','turn over','flip'], verbs:[ {forms:['turned','flipped'], expectBe:'is'} ] },
+    { id:8, body:2, anchors:['plate','keep it warm','keep warm'], verbs:[ {forms:['placed','put'], expectBe:'is'}, {forms:['covered'], expectBe:'is'} ] },
+    { id:9, body:2, anchors:['syrup','served'], verbs:[ {forms:['served'], expectBe:'are'} ] }
+  ];
+  var CONNECTOR_BUCKETS = [
+    {key:'first', re:/\b(in the first stage|first,)/i},
+    {key:'next', re:/\bnext,/i},
+    {key:'then', re:/\b(then,|is then\b|are then\b)/i},
+    {key:'afterThat', re:/\bafter that\b/i},
+    {key:'once', re:/\bonce\b/i},
+    {key:'when', re:/\bwhen\b/i},
+    {key:'while', re:/\bwhile\b/i},
+    {key:'atThisPoint', re:/\bat this point\b/i},
+    {key:'atSameTime', re:/\bat the same time\b/i},
+    {key:'cookingPhase', re:/\bin the cooking phase\b/i},
+    {key:'finally', re:/\b(finally,|in the final stage)\b/i},
+    {key:'until', re:/\buntil\b/i}
+  ];
+  var LITERAL_SPOKEN = ['make sure you','we start by','everyone ready','happy eating','the pancake mix','a little butter','or so longer','so please','here we go'];
+  function checkVerbGroup(text, group, stepId, issues){
+    var re = new RegExp('\\b('+group.forms.join('|')+')\\b','gi');
+    var m, any = false;
+    while((m = re.exec(text))){
+      any = true;
+      var word = m[0].toLowerCase(), idx = m.index;
+      var sentStart = 0;
+      for(var p = idx-1; p >= 0; p--){ var ch = text[p]; if(ch==='.'||ch==='!'||ch==='?'){ sentStart = p+1; break; } }
+      var sentenceSoFar = text.slice(sentStart, idx);
+      var beMatches = sentenceSoFar.match(/\b(is|are)\b/gi);
+      if(!beMatches || !beMatches.length){
+        issues.push({code:'PV', step:stepId, msg:'Bước '+stepId+': câu thiếu "is/are" cho động từ "'+word+'".'});
+      } else {
+        var lastBe = beMatches[beMatches.length-1].toLowerCase();
+        if(lastBe !== group.expectBe){
+          issues.push({code:'SV', step:stepId, msg:'Bước '+stepId+': dùng "'+lastBe+'" nhưng cần "'+group.expectBe+'" với "'+word+'".'});
+        }
+      }
+    }
+    if(!any){ issues.push({code:'V3', step:stepId, msg:'Bước '+stepId+': chưa thấy dạng đúng của động từ (cần: '+group.forms.join('/')+').'}); }
+    return any;
+  }
+  function analyzeEssay(body1, body2){
+    var text1 = body1||'', text2 = body2||'';
+    var lower1 = text1.toLowerCase(), lower2 = text2.toLowerCase();
+    var combined = text1+' '+text2, lowerAll = combined.toLowerCase();
+    var issues = [];
+    var missingSteps = 0, misplaced = false;
+    var found1 = [], found2 = [];
+    STEP_CHECK.forEach(function(cfg){
+      var ownLower = cfg.body===1 ? lower1 : lower2;
+      var otherLower = cfg.body===1 ? lower2 : lower1;
+      var ownIdx = -1;
+      cfg.anchors.forEach(function(a){ var i = ownLower.indexOf(a); if(i>-1 && (ownIdx===-1 || i<ownIdx)) ownIdx = i; });
+      var otherFound = cfg.anchors.some(function(a){ return otherLower.indexOf(a) > -1; });
+      if(ownIdx === -1 && !otherFound){
+        missingSteps++;
+        issues.push({code:'ST', step:cfg.id, msg:'Thiếu nội dung bước '+cfg.id+' ('+stepById(cfg.id).vi+').'});
+      } else if(ownIdx === -1 && otherFound){
+        misplaced = true;
+        issues.push({code:'ST', step:cfg.id, msg:'Bước '+cfg.id+' đang ở sai đoạn (nên nằm ở Body '+cfg.body+').'});
+      } else {
+        (cfg.body===1 ? found1 : found2).push({id:cfg.id, idx:ownIdx});
+        cfg.verbs.forEach(function(vg){ checkVerbGroup(cfg.body===1?text1:text2, vg, cfg.id, issues); });
+      }
+    });
+    function orderViolated(found){
+      for(var i=1;i<found.length;i++){ if(found[i].idx < found[i-1].idx) return true; }
+      return false;
+    }
+    var orderBad1 = orderViolated(found1), orderBad2 = orderViolated(found2);
+
+    var distinctConnectors = 0;
+    CONNECTOR_BUCKETS.forEach(function(b){ if(b.re.test(combined)) distinctConnectors++; });
+    var thenCount = (combined.match(/\bthen\b/gi) || []).length;
+    var hasWhile23 = /while/i.test(combined);
+
+    var hasIF = /\b(you|we|please)\b/i.test(combined) || /\b(cover|covers|covered|covering|serve|serves|served|serving)\b[^.]{0,18}\bup\b/i.test(combined);
+    var hasOP = /\b(delicious|yummy|tasty|cheap|easy|quick|favorite|favourite|amazing|lovely)\b/i.test(combined) || /\bin my opinion\b/i.test(combined) || /\bi think\b/i.test(combined) || /\bi love\b/i.test(combined);
+    var hasLiteral = LITERAL_SPOKEN.some(function(p){ return lowerAll.indexOf(p) > -1; });
+    if(hasIF) issues.push({code:'IF', step:null, msg:'Còn văn nói/thân mật: "you" / "we" / "please", hoặc phrasal verb + "up" (cover up, serve up).'});
+    if(hasOP) issues.push({code:'OP', step:null, msg:'Có ý kiến cá nhân (delicious, cheap, easy, in my opinion…) — Task 1 chỉ mô tả.'});
+    if(hasLiteral) issues.push({code:'IF', step:null, msg:'Có cụm chép gần nguyên văn lời thoại trong bài nghe.'});
+
+    var words = combined.trim() ? combined.trim().split(/\s+/).length : 0;
+
+    var crit1 = 3 - missingSteps*0.5 - (misplaced?1:0) - (orderBad1?0.5:0) - (orderBad2?0.5:0);
+    crit1 = Math.max(0, Math.round(crit1*2)/2);
+    var pvv3sv = issues.filter(function(i){ return i.code==='PV'||i.code==='V3'||i.code==='SV'; }).length;
+    var crit2 = Math.max(0, 3 - pvv3sv*0.5);
+    var crit3 = 2 - (thenCount>3?0.5:0) - (distinctConnectors<4?1:0);
+    crit3 = Math.max(0, crit3);
+    var crit4 = 2 - (hasIF?0.5:0) - (hasOP?0.5:0) - (hasLiteral?1:0);
+    crit4 = Math.max(0, crit4);
+    var total = Math.round((crit1+crit2+crit3+crit4)*2)/2;
+
+    return {
+      total: total, crit1:crit1, crit2:crit2, crit3:crit3, crit4:crit4,
+      issues: issues, words: words, distinctConnectors: distinctConnectors, thenCount: thenCount, hasWhile23: hasWhile23
+    };
+  }
+  var CODE_LABEL = { PV:'Sai/thiếu bị động', V3:'Sai dạng phân từ', SV:'Sai is/are', ST:'Thiếu/sai vị trí bước', IF:'Văn nói, thân mật', OP:'Ý kiến cá nhân' };
+  function renderGradeResult(container, r){
+    var critHTML = [
+      ['Đủ bước, đúng đoạn', r.crit1, 3],
+      ['Câu bị động', r.crit2, 3],
+      ['Từ nối, mạch lạc', r.crit3, 2],
+      ['Văn phong, từ vựng', r.crit4, 2]
+    ].map(function(c){
+      return '<div class="grade-crit-item"><div class="n">'+c[1]+' <small>/ '+c[2]+'</small></div><div class="l">'+c[0]+'</div></div>';
+    }).join('');
+    var issuesHTML = r.issues.length
+      ? '<div class="issue-list">'+r.issues.map(function(i){
+          return '<div class="issue-row"><span class="code-chip">'+i.code+'</span><span class="msg">'+escapeHtml(i.msg)+'</span></div>';
+        }).join('')+'</div>'
+      : '<div class="issue-empty">Không phát hiện lỗi theo mã sửa lỗi. Làm tốt lắm! 🎉</div>';
+    container.innerHTML =
+      '<h3>Kết quả chấm tự động</h3>'+
+      '<div class="grade-head"><div class="grade-score">'+r.total+'<small> / 10</small></div>'+
+        '<div style="font-size:13.5px; color:var(--ink-dim);">'+r.words+' từ · '+r.distinctConnectors+' loại từ nối · "then" × '+r.thenCount+'</div></div>'+
+      '<div class="grade-crit">'+critHTML+'</div>'+
+      '<div style="margin-top:16px;"><div class="field-label">Chi tiết theo mã sửa lỗi</div>'+issuesHTML+'</div>';
+  }
+
+  /* ---------- PART 5 ---------- */
+  var P5_ROUNDS = [
+    {n:1, label:'Vòng 1 · Drafting'},
+    {n:2, label:'Vòng 2 · Revising'},
+    {n:3, label:'Vòng 3 · Editing'}
+  ];
+  var CHECKLIST2 = [
+    'Đủ 9 bước, kể cả 2 bước không có tranh',
+    'Đúng thứ tự như Part 2C',
+    'Bước 1–4 ở Body 1, bước 5–9 ở Body 2',
+    'Câu 2 và 3 đã nối bằng "while"',
+    'Ít nhất 4 từ nối khác nhau; "then" không quá 2 lần',
+    'Không có ý kiến cá nhân (delicious, cheap, easy...)',
+    'Khoảng 120–140 từ'
+  ];
+  var CHECKLIST3 = [
+    'Mỗi câu có is / are + V3 (trừ "the edges turn brown", "the butter has melted")',
+    'is / are đúng với chủ ngữ (3 nguyên liệu → are)',
+    'V3 đúng: put, weighed, combined, added, stirred, heated, greased, poured, turned, placed, covered, served',
+    'Không còn "you", "we", "please"',
+    'Không còn phrasal verb kèm "up": cover up, serve up',
+    'Có dấu phẩy sau từ nối đầu câu: In the first stage, / Next, / At this point, / Finally,',
+    'Chính tả: ingredients, separate, constantly, greased, remaining'
+  ];
+  function renderP5Tabs(){
+    var box = document.getElementById('p5RoundTabs');
+    box.innerHTML = '';
+    P5_ROUNDS.forEach(function(r){
+      var btn = document.createElement('button');
+      btn.className = 'round-tab' + (state.p5.round===r.n?' active':'');
+      btn.textContent = r.label;
+      btn.disabled = r.n > state.p5.round && !(r.n===state.p5.round+0);
+      btn.disabled = r.n > Math.max(state.p5.round, state.p5._maxReached||1);
+      btn.addEventListener('click', function(){ if(!btn.disabled){ state.p5.round = r.n; saveState(); renderP5(); } });
+      box.appendChild(btn);
+    });
+  }
+  function renderP5Extra(){
+    var box = document.getElementById('p5RoundExtra');
+    if(state.p5.round===1){
+      box.innerHTML = '<h3>Việc cần làm ở vòng 1</h3><ul style="padding-left:20px; color:var(--ink-dim); font-size:14.5px; line-height:1.8;">'+
+        '<li>Viết Body 1 (bước 1–4) và Body 2 (bước 5–9) bằng câu bị động, dựa vào những câu bạn đã luyện ở Part 4.</li>'+
+        '<li>Nối câu 2 và 3 bằng <b>"while"</b> thay vì "At the same time", để gộp thành một câu.</li>'+
+        '<li>Dùng nhiều loại từ nối khác nhau (xem bảng bên dưới); tránh lặp "then" quá 2 lần.</li>'+
+        '</ul>';
+    } else if(state.p5.round===2){
+      box.innerHTML = '<h3>Checklist vòng 2 — Revising</h3><ul class="checklist" id="p5c2"></ul>';
+      var ul = document.getElementById('p5c2');
+      CHECKLIST2.forEach(function(text, i){
+        var li = document.createElement('li');
+        li.innerHTML = '<input type="checkbox" '+(state.p5.c2[i]?'checked':'')+'> <span>'+text+'</span>';
+        li.querySelector('input').addEventListener('change', function(e){ state.p5.c2[i]=e.target.checked; saveState(); });
+        ul.appendChild(li);
+      });
+    } else if(state.p5.round===3){
+      box.innerHTML = '<h3>Checklist vòng 3 — Editing</h3><ul class="checklist" id="p5c3"></ul>'+
+        '<div class="btn-row"><button class="btn btn-berry" id="p5Submit3">'+(state.p5.submitted3?'Chấm thử lại':'Tự chấm thử (xem bài mẫu)')+'</button></div>'+
+        '<p style="font-size:13px; color:var(--ink-dim); margin-top:8px;">Chấm thử chỉ để bạn tự tham khảo. Khi hoàn tất, bấm <b>"Lưu bản cuối"</b> bên dưới để gửi bài cho GV chấm.</p>'+
+        '<div id="p5GradeBox" style="margin-top:18px;"></div>';
+      var ul = document.getElementById('p5c3');
+      CHECKLIST3.forEach(function(text, i){
+        var li = document.createElement('li');
+        li.innerHTML = '<input type="checkbox" '+(state.p5.c3[i]?'checked':'')+'> <span>'+text+'</span>';
+        li.querySelector('input').addEventListener('change', function(e){ state.p5.c3[i]=e.target.checked; saveState(); });
+        ul.appendChild(li);
+      });
+      document.getElementById('p5Submit3').addEventListener('click', function(){
+        state.p5.submitted3 = true; saveState();
+        document.getElementById('sampleLocked').style.display='none';
+        document.getElementById('sampleContent').hidden = false;
+        var result = analyzeEssay(state.p5.body1, state.p5.body2);
+        renderGradeResult(document.getElementById('p5GradeBox'), result);
+        renderNav(); renderReport();
+        document.getElementById('p5Submit3').textContent = 'Chấm thử lại';
+      });
+      if(state.p5.submitted3){
+        renderGradeResult(document.getElementById('p5GradeBox'), analyzeEssay(state.p5.body1, state.p5.body2));
+      }
+    }
+  }
+  function updateWordCount(){
+    var text = (document.getElementById('p5Body1').value + ' ' + document.getElementById('p5Body2').value).trim();
+    var words = text ? text.split(/\s+/).length : 0;
+    var el = document.getElementById('p5WordCount');
+    el.textContent = words + ' từ (mục tiêu 120–140 từ)';
+    el.className = 'wordcount ' + (words>=120 && words<=140 ? 'good' : (words>0 ? 'warn' : ''));
+  }
+  function renderP5(){
+    renderP5Tabs();
+    renderP5Extra();
+    document.getElementById('p5Body1').value = state.p5.body1;
+    document.getElementById('p5Body2').value = state.p5.body2;
+    updateWordCount();
+    var nextBtn = document.getElementById('p5NextRound');
+    nextBtn.textContent = state.p5.round<3 ? 'Lưu & sang vòng sau' : (state.p5.finalSaved ? 'Lưu lại bản cuối' : 'Lưu bản cuối');
+  }
+  document.getElementById('p5Body1').addEventListener('input', function(e){ state.p5.body1=e.target.value; state.p5.touched=true; saveState(); updateWordCount(); });
+  document.getElementById('p5Body2').addEventListener('input', function(e){ state.p5.body2=e.target.value; state.p5.touched=true; saveState(); updateWordCount(); });
+  document.getElementById('p5NextRound').addEventListener('click', function(){
+    var isFinalSave = state.p5.round === 3;
+    state.p5._maxReached = Math.max(state.p5._maxReached||1, state.p5.round+1);
+    if(state.p5.round<3) state.p5.round++;
+    if(isFinalSave) state.p5.finalSaved = true;
+    saveState(); renderP5(); renderNav();
+    if(isFinalSave){ silentSubmitReport(); }
+  });
+
+  /* ---------- REPORT (Google Form) ---------- */
+  var GOOGLE_FORM = {
+    base: 'https://docs.google.com/forms/d/e/1FAIpQLSfb5aLY3kpqQlOoWReJN2bQt1-wO8li76KxZJAAkuoKP1TENA/viewform',
+    entryName: 'entry.1646656411',
+    entryPart1: 'entry.1893234029',
+    entryPart2: 'entry.1982183386',
+    entryPart3: 'entry.1082328006',
+    entryPart4: 'entry.604432586',
+    entryPart5: 'entry.1366872533'
+  };
+  function reportPart1(){ return state.p1.submitted ? (state.p1.score+'/'+p1Target.length) : 'Chưa làm'; }
+  function reportPart2(){
+    if(!state.p2all) return 'Chưa làm';
+    return '2A: '+state.p2a.score+'/19 · 2B: '+state.p2b.score+'/2 · 2C: '+state.p2c.score+'/9';
+  }
+  function reportPart3(){ return state.p3.submitted ? (state.p3.score+'/'+P3_QUIZ.length) : 'Chưa làm'; }
+  function reportPart4(){
+    var n = STEPS.filter(function(s){ return !!state.p4[s.id].saved; }).length;
+    return n+'/9 bước đã lưu';
+  }
+  function essayWordCount(){
+    var text = (state.p5.body1+' '+state.p5.body2).trim();
+    return text ? text.split(/\s+/).length : 0;
+  }
+  function reportPart5(){
+    if(!essayWordCount()) return 'Chưa làm';
+    return essayWordCount()+' từ' + (state.p5.finalSaved ? ' · đã lưu bản cuối' : ' · chưa lưu bản cuối');
+  }
+  function reportPart5ForForm(){
+    var b1 = (state.p5.body1||'').trim() || '(chưa viết)';
+    var b2 = (state.p5.body2||'').trim() || '(chưa viết)';
+    var r = analyzeEssay(state.p5.body1, state.p5.body2);
+    return 'BODY 1:\n'+b1+'\n\nBODY 2:\n'+b2+'\n\n[Gợi ý điểm tự động: '+r.total+'/10 — GV chấm tay]';
+  }
+  function buildFormURL(){
+    var parts = [
+      ['usp','pp_url'],
+      [GOOGLE_FORM.entryName, state.report.name||''],
+      [GOOGLE_FORM.entryPart1, reportPart1()],
+      [GOOGLE_FORM.entryPart2, reportPart2()],
+      [GOOGLE_FORM.entryPart3, reportPart3()],
+      [GOOGLE_FORM.entryPart4, reportPart4()],
+      [GOOGLE_FORM.entryPart5, reportPart5ForForm()]
+    ];
+    return GOOGLE_FORM.base + '?' + parts.map(function(p){ return encodeURIComponent(p[0])+'='+encodeURIComponent(p[1]); }).join('&');
+  }
+  function fmtTime(ts){
+    var d = new Date(ts);
+    function pad(n){ return n<10?'0'+n:''+n; }
+    return pad(d.getHours())+':'+pad(d.getMinutes())+' '+pad(d.getDate())+'/'+pad(d.getMonth()+1);
+  }
+  function renderReport(){
+    var table = document.getElementById('reportTable');
+    if(!table) return;
+    table.innerHTML =
+      '<tr><th>Phần</th><th>Điểm hiện tại</th></tr>'+
+      '<tr><td>Part 1 — Listen and order</td><td>'+reportPart1()+'</td></tr>'+
+      '<tr><td>Part 2 — Listen and complete</td><td>'+reportPart2()+'</td></tr>'+
+      '<tr><td>Part 3 — Dàn ý</td><td>'+reportPart3()+'</td></tr>'+
+      '<tr><td>Part 4 — Luyện từng bước</td><td>'+reportPart4()+'</td></tr>'+
+      '<tr><td>Part 5 — Viết bài</td><td>'+reportPart5()+'</td></tr>';
+    document.getElementById('reportFormLink').href = buildFormURL();
+    var nameTag = document.getElementById('reportNameTag');
+    if(nameTag) nameTag.textContent = state.report.name ? '· ' + state.report.name : '';
+    var status = document.getElementById('sendStatus');
+    if(status){
+      if(state.report.lastSentAt){
+        status.className = 'send-status';
+        status.textContent = '✓ Đã gửi tự động lúc ' + fmtTime(state.report.lastSentAt) + '.';
+      } else {
+        status.className = 'send-status warn';
+        status.textContent = 'Chưa gửi — sẽ tự gửi khi bạn bấm "Lưu bản cuối" ở Part 5, hoặc bấm "Gửi lại báo cáo điểm".';
+      }
+    }
+  }
+  function silentSubmitReport(){
+    if(!state.report.name || !state.report.name.trim()){
+      var status = document.getElementById('sendStatus');
+      if(status){ status.className = 'send-status warn'; status.textContent = 'Chưa gửi được: nhập Họ và tên ở đầu trang rồi thử lại.'; }
+      return false;
+    }
+    var f = document.createElement('form');
+    f.action = GOOGLE_FORM.base.replace('/viewform', '/formResponse');
+    f.method = 'POST';
+    f.target = 'hiddenReportFrame';
+    f.style.display = 'none';
+    var fields = [
+      [GOOGLE_FORM.entryName, state.report.name],
+      [GOOGLE_FORM.entryPart1, reportPart1()],
+      [GOOGLE_FORM.entryPart2, reportPart2()],
+      [GOOGLE_FORM.entryPart3, reportPart3()],
+      [GOOGLE_FORM.entryPart4, reportPart4()],
+      [GOOGLE_FORM.entryPart5, reportPart5ForForm()]
+    ];
+    fields.forEach(function(pair){
+      var inp = document.createElement('input');
+      inp.type = 'hidden'; inp.name = pair[0]; inp.value = pair[1];
+      f.appendChild(inp);
+    });
+    document.body.appendChild(f);
+    f.submit();
+    setTimeout(function(){ f.remove(); }, 1500);
+    state.report.lastSentAt = Date.now();
+    saveState(); renderReport();
+    return true;
+  }
+  var reportNameInput = document.getElementById('reportName');
+  reportNameInput.value = state.report.name;
+  reportNameInput.addEventListener('input', function(e){ state.report.name = e.target.value; saveState(); renderReport(); });
+  document.getElementById('reportResend').addEventListener('click', function(){ silentSubmitReport(); });
+
+  /* ---------- init ---------- */
+  function init(){
+    renderNav();
+    renderPart1();
+    renderGapText();
+    renderP2B();
+    renderPart2C();
+    renderPart3();
+    renderP4();
+    renderP5();
+    renderReport();
+    if(state.p2all){
+      document.getElementById('p2Reveal').hidden = false;
+      document.getElementById('p2Locked').style.display = 'none';
+      renderTranscriptAndAnswers();
+    }
+    if(state.p5.submitted3){
+      document.getElementById('sampleLocked').style.display='none';
+      document.getElementById('sampleContent').hidden = false;
+    }
+    setActivePart('part1');
+  }
+  init();
+})();
+</script>
